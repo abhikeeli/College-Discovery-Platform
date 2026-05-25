@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // Disable for testing with Postman
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/api/colleges/**","/api/colleges").permitAll()
+                        .requestMatchers("/api/auth/**","/api/colleges/**","/api/colleges","/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/discussions/**","/api/v1/discussions").permitAll() // Anyone can browse threads
                         .requestMatchers("/api/v1/discussions/ask", "/api/v1/discussions/*/answer").authenticated() // Auth required
                         .requestMatchers("/api/v1/saved/**").authenticated() // Bookmarking requires login context tokens
@@ -52,7 +52,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // Allow both local development and your future Vercel URL
-        config.setAllowedOrigins(List.of("http://localhost:5173", "https://smart-library-system-frontend.vercel.app/"));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
