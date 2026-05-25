@@ -15,5 +15,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Slice<Question> findByOrderByCreatedAtDesc(Pageable pageable);
 
 
-    List<Question> findByCollegeId(Long collegeId);
+    Slice<Question> findByCollegeIdOrderByCreatedAtDesc(Long collegeId ,Pageable pageable);
 }

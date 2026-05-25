@@ -25,19 +25,33 @@ public class DiscussionController {
     private final AnswerRepository answerRepository;
     @Autowired
     private final UserRepo userRepo;
+    @Autowired
+    private final CollegeRepository collegeRepository;
 
 
     @GetMapping
-    public ResponseEntity<Slice<Question>> browseDiscussions(@RequestParam(defaultValue = "0") int page) {
-        return ResponseEntity.ok(questionRepository.findByOrderByCreatedAtDesc(PageRequest.of(page, 15)));
+    public ResponseEntity<Slice<Question>> browseDiscussions(
+            @RequestParam(required = false) Long collegeId,
+            @RequestParam(defaultValue = "0") int page) {
+
+        PageRequest pageRequest = PageRequest.of(page, 15);
+
+        if (collegeId != null) {
+            return ResponseEntity.ok(questionRepository.findByCollegeIdOrderByCreatedAtDesc(collegeId, pageRequest));
+        }
+
+        return ResponseEntity.ok(questionRepository.findByOrderByCreatedAtDesc(pageRequest));
     }
 
-
     @PostMapping("/ask")
-    public ResponseEntity<Question> askQuestion(@RequestBody Question question, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Question> askQuestion(@RequestBody Question question,@RequestBody(required = false) Long collegeId,@AuthenticationPrincipal UserDetails userDetails) {
         Users currentUser = userRepo.findByusername(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User Context Missing"));
         question.setUser(currentUser);
+        if(collegeId != null){
+            College targetCollege = collegeRepository.findById(collegeId).orElseThrow(()->new IllegalArgumentException("Target College not found"));
+            question.setCollege(targetCollege);
+        }
         return ResponseEntity.ok(questionRepository.save(question));
     }
 
